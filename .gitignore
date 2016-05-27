@@ -244,3 +244,4 @@ ModelManifest.xml
 # FAKE - F# Make
 .fake/
 /WiseMan/WiseMan.API/Data
+/WiseMan/WiseMan.API/Web.config
