@@ -264,6 +264,7 @@
     <Compile Include="Models\ErrorResult.cs" />
     <Compile Include="Models\IdentityModels.cs" />
     <Compile Include="Models\Message.cs" />
+    <Compile Include="Models\NewMessage.cs" />
     <Compile Include="Models\Profile.cs" />
     <Compile Include="Models\RegistrationSuccess.cs" />
     <Compile Include="Models\Tag.cs" />

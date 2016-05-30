@@ -338,7 +338,6 @@ namespace WiseMan.API.Controllers
             ApiQueryResult<RegistrationSuccess> result = new ApiQueryResult<RegistrationSuccess>(this.Request);
             try
             {
-
                 AccountHelper.RegisterNewAccount(model.Username, model.Password, model.Email);
                 result.Content = new RegistrationSuccess()
                 {

@@ -17,9 +17,17 @@ namespace WiseMan.API.Utility
         /// <param name="body"></param>
         /// <param name="authorId"></param>
         /// <param name="tags"></param>
-        public static void CreateMessage(string body, Guid authorId, List<Tag> tags)
+        public static void CreateMessage(string messageBody, Guid authorId, List<string> tags)
         {
-            //create new message
+            string tagString = "";
+            foreach (var item in tags)
+            {
+                tagString += item + ",";
+            }
+            using(WiseMan.API.Data.WiseManEntities db = new Data.WiseManEntities())
+            {
+                db.CreateMessage(messageBody, tagString, authorId);
+            }
         }
     }
 }

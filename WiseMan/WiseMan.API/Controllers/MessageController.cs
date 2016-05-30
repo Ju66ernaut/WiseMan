@@ -6,6 +6,7 @@ using System.Net.Http;
 using System.Web.Http;
 using System.Web.Http.Description;
 using WiseMan.API.Models;
+using WiseMan.API.Utility;
 
 namespace WiseMan.API.Controllers
 {
@@ -63,13 +64,74 @@ namespace WiseMan.API.Controllers
         /// <param name=""></param>
         /// <returns></returns>
         [Route("new"), HttpPost]
-        public IHttpActionResult CreateMessage(string message, Guid authorId, List<Tag> tags)
+        //public IHttpActionResult CreateMessage(string messageBody, Guid authorId, List<string> tags)
+        public IHttpActionResult CreateMessage(NewMessage newMessage)
         {
-            if (string.IsNullOrEmpty(message) || authorId == null || tags.Count == 0)
+            //TODO
+            //restrict tag length
+            //no spaces in tags (tell users to use '-')
+            ApiQueryResult<ErrorResult> exResult = new ApiQueryResult<ErrorResult>(this.Request);
+            if (string.IsNullOrEmpty(newMessage.Body))
             {
-                //
+                exResult.Content = new ErrorResult() { HttpStatusCode = HttpStatusCode.BadRequest, ErrorMessage = "message body can not be empty" };
+                return exResult;
             }
-            return null;
+            if(newMessage.AuthorId == null)
+            {
+                exResult.Content = new ErrorResult() { HttpStatusCode = HttpStatusCode.BadRequest, ErrorMessage = "authorId is null" };
+                return exResult;
+            }
+            if(newMessage.Tags.Count == 0 || newMessage.Tags.Count > 3)
+            {
+                exResult.Content = new ErrorResult() { HttpStatusCode = HttpStatusCode.BadRequest, ErrorMessage = "messages can only have up to 3 tags" };
+                return exResult;
+            }
+            if (newMessage.Tags.Any(x => string.IsNullOrEmpty(x)))
+            {
+                exResult.Content = new ErrorResult() { HttpStatusCode = HttpStatusCode.BadRequest, ErrorMessage = "tags cannot be empty" };
+                return exResult;
+            }
+            if(newMessage.Tags.Any(x => x.Any(chr => char.IsDigit(chr))))
+            {
+                exResult.Content = new ErrorResult() { HttpStatusCode = HttpStatusCode.BadRequest, ErrorMessage = "tags cannot contain numbers" };
+                return exResult;
+            }
+
+            try
+            {
+                //TODO:
+                //check DB for last post
+                //if user points amount is under X amount, limit the post intervals
+                ////if last post was within 8 min, reject the current post
+                List<string> tagsLower = newMessage.Tags.Select(t => t.ToLowerInvariant()).ToList();
+             
+                MessageHelper.CreateMessage(newMessage.Body, newMessage.AuthorId, tagsLower); //get tagIds out?
+
+                //return new message data back?
+
+                //what data needs to be returned here? return Message or NewMessage data
+                ApiQueryResult<Message> message = new ApiQueryResult<Message>(this.Request)
+                {
+                    StatusCode = HttpStatusCode.Created,
+                    Content = new Message()
+                    {
+                        Body = newMessage.Body,
+                        Downvotes = 0,
+                        Upvotes = 1,
+                        //Tags = tags
+                    }
+                };
+                return message;
+            }
+            catch (Exception ex)
+            {
+                exResult.Content = new ErrorResult()
+                {
+                    ErrorMessage = ex.InnerException.Message,
+                    HttpStatusCode = System.Net.HttpStatusCode.InternalServerError
+                };
+                return exResult;
+            }
         }
 
         /// <summary>
@@ -79,10 +141,10 @@ namespace WiseMan.API.Controllers
         /// <param name="tags"></param>
         /// <param name="authorId"></param>
         /// <returns></returns>
-        [Route("modifytags/{messageId}"),HttpPost]
+        [Route("modifytags/{messageId}"), HttpPost]
         public IHttpActionResult UpdateMessageTags(Guid messageId, List<Tag> tags, Guid authorId)
         {
-            if(messageId == null || tags.Count == 0 || authorId == null)
+            if (messageId == null || tags.Count == 0 || authorId == null)
             {
                 //
             }
@@ -147,7 +209,7 @@ namespace WiseMan.API.Controllers
         public IHttpActionResult GetFavorites(Guid userId)
         {
             //may not need userId if i decide to use JWT
-            if(userId == null)
+            if (userId == null)
             {
                 //
             }
@@ -162,7 +224,7 @@ namespace WiseMan.API.Controllers
         [Route("tag/{tagId}"), HttpGet, ResponseType(typeof(List<Message>))]
         public IHttpActionResult GetMessagesByTag(Guid tagId)
         {
-            if(tagId == null)
+            if (tagId == null)
             {
 
             }
@@ -182,7 +244,7 @@ namespace WiseMan.API.Controllers
         {
             //not sure about this implementation
             //top, new
-            if(string.IsNullOrEmpty(methodName) || userId == null)
+            if (string.IsNullOrEmpty(methodName) || userId == null)
             {
                 //
             }
