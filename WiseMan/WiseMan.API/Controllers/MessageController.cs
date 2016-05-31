@@ -62,11 +62,32 @@ namespace WiseMan.API.Controllers
         [Route("authorId/{authorId}"), HttpGet, ResponseType(typeof(List<Message>))]
         public IHttpActionResult GetMessagesByAuthor(Guid authorId)
         {
+            ApiQueryResult<ErrorResult> exResult = new ApiQueryResult<ErrorResult>(this.Request);
             if (authorId == null)
             {
-                //
+                exResult.Content = new ErrorResult() { HttpStatusCode = HttpStatusCode.BadRequest, ErrorMessage = "authorId is null" };
+                return exResult;
             }
-            return null;
+
+            try
+            {
+                List<Message> messagesByAuthor = MessageHelper.GetMessagesByAuthorId(authorId);
+                ApiQueryResult<List<Message>> messages = new ApiQueryResult<List<Message>>(this.Request)
+                {
+                    Content = messagesByAuthor,
+                    StatusCode = HttpStatusCode.OK
+                };
+                return messages;
+            }
+            catch (Exception ex)
+            {
+                exResult.Content = new ErrorResult()
+                {
+                    ErrorMessage = ex.InnerException.Message,
+                    HttpStatusCode = System.Net.HttpStatusCode.InternalServerError
+                };
+                return exResult;
+            }
         }
 
         /// <summary>

@@ -44,5 +44,35 @@ namespace WiseMan.API.Utility
             }
             return message;
         }
+
+        internal static List<Message> GetMessagesByAuthorId(Guid authorId)
+        {
+            List<Message> messages = new List<Message>();
+            using(Data.WiseManEntities db = new Data.WiseManEntities())
+            {
+                var results = db.GetMessagesByAuthor(authorId).ToList();
+                foreach (var item in results)
+                {
+                    List<Tag> tags = new List<Tag>();
+                    List<string> tagNames = item.TagArray.Split(',').ToList();
+                    foreach (var tag in tagNames)
+                    {
+                        tags.Add(new Tag()
+                        {
+                            Name = tag
+                        });
+                    }
+                    messages.Add(new Message()
+                    {
+                        Body = item.Body,
+                        Downvotes = item.Downvotes,
+                        Id = item.MessageId,
+                        Upvotes = item.Upvotes,
+                        Tags = tags
+                    });
+                }
+            }
+            return messages;
+        }
     }
 }
