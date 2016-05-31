@@ -21,23 +21,36 @@ namespace WiseMan.API.Controllers
         [Route("id/{messageId}"), HttpGet, ResponseType(typeof(Message))]
         public IHttpActionResult GetMessage(Guid messageId)
         {
+            ApiQueryResult<ErrorResult> exResult = new ApiQueryResult<ErrorResult>(this.Request);
             if (messageId == null)
             {
-                //return error message
-                return BadRequest("messageId is null");
+                exResult.Content = new ErrorResult()
+                {
+                    ErrorMessage = "messageId is null",
+                    HttpStatusCode = HttpStatusCode.BadRequest
+                };
+                return exResult;
             }
             try
             {
+                Message message = MessageHelper.GetMessageById(messageId);
+
                 return new ApiQueryResult<Message>(this.Request)
                 {
-                    //Content = message
+                    Content = message,
+                    StatusCode = HttpStatusCode.OK
                 };
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                //need error handling
+                //need better error handling?
                 //http://www.asp.net/web-api/overview/error-handling/web-api-global-error-handling 
-                throw;
+                exResult.Content = new ErrorResult()
+                {
+                    ErrorMessage = ex.InnerException.Message,
+                    HttpStatusCode = HttpStatusCode.InternalServerError
+                };
+                return exResult;
             }
         }
 

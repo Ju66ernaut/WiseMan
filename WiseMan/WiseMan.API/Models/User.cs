@@ -17,6 +17,8 @@ namespace WiseMan.API.Models
 
         public int Age { get; set; }
 
+        public string Username { get; set; }
+
         public List<Message> Favorites { get; set; }
     }
 }

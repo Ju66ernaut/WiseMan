@@ -24,10 +24,25 @@ namespace WiseMan.API.Utility
             {
                 tagString += item + ",";
             }
-            using(WiseMan.API.Data.WiseManEntities db = new Data.WiseManEntities())
+            using(Data.WiseManEntities db = new Data.WiseManEntities())
             {
                 db.CreateMessage(messageBody, tagString, authorId);
             }
+        }
+
+        /// <summary>
+        /// Gets a message by id
+        /// </summary>
+        /// <param name="messageId"></param>
+        /// <returns></returns>
+        internal static Message GetMessageById(Guid messageId)
+        {
+            Message message;
+            using(Data.WiseManEntities db = new Data.WiseManEntities())
+            {
+                message = new Message(db.GetMessageById(messageId).FirstOrDefault());
+            }
+            return message;
         }
     }
 }
