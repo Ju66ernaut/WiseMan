@@ -110,12 +110,12 @@ namespace WiseMan.API.Controllers
                 exResult.Content = new ErrorResult() { HttpStatusCode = HttpStatusCode.BadRequest, ErrorMessage = "message body can not be empty" };
                 return exResult;
             }
-            if(newMessage.AuthorId == null)
+            if (newMessage.AuthorId == null)
             {
                 exResult.Content = new ErrorResult() { HttpStatusCode = HttpStatusCode.BadRequest, ErrorMessage = "authorId is null" };
                 return exResult;
             }
-            if(newMessage.Tags.Count == 0 || newMessage.Tags.Count > 3)
+            if (newMessage.Tags.Count == 0 || newMessage.Tags.Count > 3)
             {
                 exResult.Content = new ErrorResult() { HttpStatusCode = HttpStatusCode.BadRequest, ErrorMessage = "messages can only have up to 3 tags" };
                 return exResult;
@@ -125,7 +125,7 @@ namespace WiseMan.API.Controllers
                 exResult.Content = new ErrorResult() { HttpStatusCode = HttpStatusCode.BadRequest, ErrorMessage = "tags cannot be empty" };
                 return exResult;
             }
-            if(newMessage.Tags.Any(x => x.Any(chr => char.IsDigit(chr))))
+            if (newMessage.Tags.Any(x => x.Any(chr => char.IsDigit(chr))))
             {
                 exResult.Content = new ErrorResult() { HttpStatusCode = HttpStatusCode.BadRequest, ErrorMessage = "tags cannot contain numbers" };
                 return exResult;
@@ -138,7 +138,7 @@ namespace WiseMan.API.Controllers
                 //if user points amount is under X amount, limit the post intervals
                 ////if last post was within 8 min, reject the current post
                 List<string> tagsLower = newMessage.Tags.Select(t => t.ToLowerInvariant()).ToList();
-             
+
                 MessageHelper.CreateMessage(newMessage.Body, newMessage.AuthorId, tagsLower); //get tagIds out?
 
                 //return new message data back?
@@ -175,15 +175,15 @@ namespace WiseMan.API.Controllers
         /// <param name="tags"></param>
         /// <param name="authorId"></param>
         /// <returns></returns>
-        [Route("modifytags/{messageId}"), HttpPost]
-        public IHttpActionResult UpdateMessageTags(Guid messageId, List<Tag> tags, Guid authorId)
-        {
-            if (messageId == null || tags.Count == 0 || authorId == null)
-            {
-                //
-            }
-            return null;
-        }
+        //[Route("modifytags/{messageId}"), HttpPost]
+        //public IHttpActionResult UpdateMessageTags(Guid messageId, List<Tag> tags, Guid authorId)
+        //{
+        //    if (messageId == null || tags.Count == 0 || authorId == null)
+        //    {
+        //        //
+        //    }
+        //    return null;
+        //}
 
         /// <summary>
         /// Deletes the message with the given Id
@@ -194,11 +194,41 @@ namespace WiseMan.API.Controllers
         [Route("delete/{messageId}"), HttpDelete]
         public IHttpActionResult DeleteMessage(Guid authorId, Guid messageId)
         {
-            if (authorId == null || messageId == null)
+            ApiQueryResult<ErrorResult> exResult = new ApiQueryResult<ErrorResult>(this.Request);
+            if (authorId == null)
             {
-                //
+                exResult.Content = new ErrorResult() { HttpStatusCode = HttpStatusCode.BadRequest, ErrorMessage = "authorId cannot be null" };
+                return exResult;
             }
-            return null;
+            if (messageId == null)
+            {
+                exResult.Content = new ErrorResult() { HttpStatusCode = HttpStatusCode.BadRequest, ErrorMessage = "messageId cannot be null" };
+                return exResult;
+            }
+
+            try
+            {
+                MessageHelper.DeleteMessage(authorId, messageId);
+
+                return new ApiQueryResult<DeleteMessageSuccess>(this.Request)
+                {
+                    StatusCode = HttpStatusCode.Accepted,
+                    Content = new DeleteMessageSuccess()
+                    {
+                        HttpStatusCode = HttpStatusCode.Accepted,
+                        Message = "Message deleted"
+                    }
+                };
+            }
+            catch (Exception ex)
+            {
+                exResult.Content = new ErrorResult()
+                {
+                    ErrorMessage = ex.InnerException.Message,
+                    HttpStatusCode = HttpStatusCode.InternalServerError
+                };
+                return exResult;
+            }
         }
 
         /// <summary>

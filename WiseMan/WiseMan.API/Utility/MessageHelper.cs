@@ -74,5 +74,13 @@ namespace WiseMan.API.Utility
             }
             return messages;
         }
+
+        internal static void DeleteMessage(Guid authorId, Guid messageId)
+        {
+            using(Data.WiseManEntities db = new Data.WiseManEntities())
+            {
+                db.DeleteMessage(messageId, authorId);
+            }
+        }
     }
 }
