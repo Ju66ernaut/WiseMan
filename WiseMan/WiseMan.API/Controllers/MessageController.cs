@@ -245,6 +245,15 @@ namespace WiseMan.API.Controllers
             {
                 //
             }
+            //has current user already upvoted?
+            //has current user already downvoted
+            //has the user taken any action on this message
+            //cannot upvote their own message
+
+            //upvoting increments the message's upvotes
+
+            //userUpvote table?
+
             return null;
         }
         /// <summary>
@@ -262,6 +271,13 @@ namespace WiseMan.API.Controllers
 
             }
             return null;
+
+            //has current user already upvoted?
+            //has current user already downvoted
+            //has the user taken any action on this message
+            //cannot downvote their own message
+
+            //downvoting increases the messages downvotes
         }
 
         /// <summary>
@@ -286,8 +302,9 @@ namespace WiseMan.API.Controllers
         /// <param name="tagId"></param>
         /// <returns></returns>
         [Route("tag/{tagId}"), HttpGet, ResponseType(typeof(List<Message>))]
-        public IHttpActionResult GetMessagesByTag(Guid tagId)
+        public IHttpActionResult GetMessagesByTags(Guid tagId)
         {
+            //take in array of tags?
             if (tagId == null)
             {
 
