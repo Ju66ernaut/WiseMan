@@ -5,6 +5,7 @@ using System.Net;
 using System.Net.Http;
 using System.Web.Http;
 using System.Web.Http.Description;
+using WiseMan.API.Filters;
 using WiseMan.API.Models;
 
 namespace WiseMan.API.Controllers
@@ -19,13 +20,37 @@ namespace WiseMan.API.Controllers
         /// <param name="userId"></param>
         /// <returns></returns>
         [Route("profile/{authorId}"), HttpGet, ResponseType(typeof(Profile))]
-        public IHttpActionResult GetProfile(Guid authorId, Guid userId)
+        public IHttpActionResult GetProfile(Guid authorId)
         {
-            if(authorId == null || userId == null)
+            if(authorId == null)
             {
                 //
             }
             return null;
         }
+
+        //TODO
+
+        //[CustomAuthorization]
+        //[Route("user"), HttpGet, ResponseType(typeof(UserInfo))]
+        //public IHttpActionResult GetUserInfo()
+        //{
+        //    try
+        //    {
+        //        User user = Request.Properties["user"] as User;
+
+        //        UserInfo content = new UserInfo(user);
+
+        //        return new ApiResult<UserInfo>(this.Request)
+        //        {
+        //            StatusCode = HttpStatusCode.OK,
+        //            Content = content
+        //        };
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return InternalServerError(ex);
+        //    }
+        //}
     }
 }

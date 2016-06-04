@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
+using WiseMan.API.Models;
 
 namespace WiseMan.API.Utility
 {
@@ -51,6 +52,13 @@ namespace WiseMan.API.Utility
             }
 
         }
+
+        //TODO
+        internal static bool ValidateUser(string username, string password, out User user)
+        {
+            throw new NotImplementedException();
+        }
+
         internal static string CreateSalt(int size)
         {
             var rng = new System.Security.Cryptography.RNGCryptoServiceProvider();
@@ -77,6 +85,10 @@ namespace WiseMan.API.Utility
             return hex.Replace("-", "");
         }
 
-        
+        //TODO
+        internal static User GetUserByUsername(string username)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

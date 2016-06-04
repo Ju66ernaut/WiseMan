@@ -20,5 +20,7 @@ namespace WiseMan.API.Models
         public string Username { get; set; }
 
         public List<Message> Favorites { get; set; }
+
+        public Guid ProfileId { get; set; }
     }
 }

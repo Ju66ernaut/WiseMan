@@ -43,7 +43,7 @@ namespace WiseMan.API.Controllers
             }
             catch (Exception ex)
             {
-                //need better error handling?
+                //maybe better error handling?
                 //http://www.asp.net/web-api/overview/error-handling/web-api-global-error-handling 
                 exResult.Content = new ErrorResult()
                 {
@@ -93,12 +93,9 @@ namespace WiseMan.API.Controllers
         /// <summary>
         /// Creates a new message
         /// </summary>
-        /// <param name="message"></param>
-        /// <param name="authorId"></param>
-        /// <param name=""></param>
+        /// <param name="newMessage"></param>
         /// <returns></returns>
         [Route("new"), HttpPost]
-        //public IHttpActionResult CreateMessage(string messageBody, Guid authorId, List<string> tags)
         public IHttpActionResult CreateMessage(NewMessage newMessage)
         {
             //TODO
@@ -169,37 +166,15 @@ namespace WiseMan.API.Controllers
         }
 
         /// <summary>
-        /// Updates the tags of the given message
-        /// </summary>
-        /// <param name="messageId"></param>
-        /// <param name="tags"></param>
-        /// <param name="authorId"></param>
-        /// <returns></returns>
-        //[Route("modifytags/{messageId}"), HttpPost]
-        //public IHttpActionResult UpdateMessageTags(Guid messageId, List<Tag> tags, Guid authorId)
-        //{
-        //    if (messageId == null || tags.Count == 0 || authorId == null)
-        //    {
-        //        //
-        //    }
-        //    return null;
-        //}
-
-        /// <summary>
         /// Deletes the message with the given Id
         /// </summary>
-        /// <param name="authorId"></param>
         /// <param name="messageId"></param>
         /// <returns></returns>
         [Route("delete/{messageId}"), HttpDelete]
-        public IHttpActionResult DeleteMessage(Guid authorId, Guid messageId)
+        public IHttpActionResult DeleteMessage(Guid messageId)
         {
             ApiQueryResult<ErrorResult> exResult = new ApiQueryResult<ErrorResult>(this.Request);
-            if (authorId == null)
-            {
-                exResult.Content = new ErrorResult() { HttpStatusCode = HttpStatusCode.BadRequest, ErrorMessage = "authorId cannot be null" };
-                return exResult;
-            }
+     
             if (messageId == null)
             {
                 exResult.Content = new ErrorResult() { HttpStatusCode = HttpStatusCode.BadRequest, ErrorMessage = "messageId cannot be null" };
@@ -208,7 +183,9 @@ namespace WiseMan.API.Controllers
 
             try
             {
-                MessageHelper.DeleteMessage(authorId, messageId);
+                //TODO
+                //get authorId from user object 
+                //MessageHelper.DeleteMessage(user.Id, messageId);
 
                 return new ApiQueryResult<DeleteMessageSuccess>(this.Request)
                 {

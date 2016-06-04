@@ -5,6 +5,7 @@ using System.Net.Http;
 using System.Web.Http;
 using Microsoft.Owin.Security.OAuth;
 using Newtonsoft.Json.Serialization;
+using Newtonsoft.Json;
 
 namespace WiseMan.API
 {
@@ -12,19 +13,23 @@ namespace WiseMan.API
     {
         public static void Register(HttpConfiguration config)
         {
-            // Web API configuration and services
-            // Configure Web API to use only bearer token authentication.
-            config.SuppressDefaultHostAuthentication();
-            config.Filters.Add(new HostAuthenticationFilter(OAuthDefaults.AuthenticationType));
-
+    
             // Web API routes
             config.MapHttpAttributeRoutes();
 
-            config.Routes.MapHttpRoute(
-                name: "DefaultApi",
-                routeTemplate: "api/{controller}/{id}",
-                defaults: new { id = RouteParameter.Optional }
-            );
+            //removing support for XML because reasons
+            config.Formatters.XmlFormatter.SupportedMediaTypes.Clear();
+
+            //json stuff
+            config.Formatters.JsonFormatter.SerializerSettings.Formatting = Newtonsoft.Json.Formatting.Indented;
+
+            //TODO
+            //check if we need an all props resolver for nested json objects
+            //config.Formatters.JsonFormatter.SerializerSettings.ContractResolver = new AllPropertiesResolver();
+
+            config.Formatters.JsonFormatter.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
+
+
         }
     }
 }

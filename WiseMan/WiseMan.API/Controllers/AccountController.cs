@@ -1,24 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Net.Http;
-using System.Security.Claims;
-using System.Security.Cryptography;
 using System.Threading.Tasks;
-using System.Web;
 using System.Web.Http;
-using System.Web.Http.ModelBinding;
 using Microsoft.AspNet.Identity;
-using Microsoft.AspNet.Identity.EntityFramework;
-using Microsoft.AspNet.Identity.Owin;
-using Microsoft.Owin.Security;
-using Microsoft.Owin.Security.Cookies;
-using Microsoft.Owin.Security.OAuth;
 using WiseMan.API.Models;
-using WiseMan.API.Providers;
-using WiseMan.API.Results;
 using WiseMan.API.Utility;
 using System.Web.Http.Description;
-using System.Web.Helpers;
+using System.Collections.Generic;
+using System.Net;
 
 namespace WiseMan.API.Controllers
 {
@@ -26,14 +14,83 @@ namespace WiseMan.API.Controllers
     [RoutePrefix("api/v1/account")]
     public class AccountController : ApiController
     {
-        //private const string LocalLoginProvider = "Local";
-        //private ApplicationUserManager _userManager;
 
         public AccountController()
         {
         }
 
-  
+        [Route("login"), HttpPost, ResponseType(typeof(JWT.JsonWebToken))]
+        public IHttpActionResult Login(Login model)
+        {
+      
+            if (string.IsNullOrEmpty(model.Username))
+            {
+                return BadRequest("Username is required");
+            }
+            if (string.IsNullOrEmpty(model.Password))
+            {
+                return BadRequest("Password is required");
+            }
+            try
+            {
+                ////testing usertoken
+                //UserToken testToken = new UserToken(model.Username, model.Password, DateTime.Now.AddHours(1));
+                //var testTokenStr = testToken.ToHexString();
+
+                User user = null;
+                var returnContent = new ApiQueryResult<object>(this.Request);
+
+                if (AccountHelper.ValidateUser(model.Username, model.Password, out user))
+                {
+                    var unixEpoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+                    var weekFromNow = Math.Round((DateTime.UtcNow.AddDays(7) - unixEpoch).TotalSeconds);
+
+                    var payload = new Dictionary<string, object>()
+                        {
+                            { "iss", "wiseman" },
+                            { "exp", weekFromNow },
+                            { "sub", model.Username }
+                            //"scopes", roles ?                                                                     
+                        };
+
+                    var secretKey = System.Configuration.ConfigurationManager.AppSettings["appKey"];
+
+                    //TODO
+                    //var token = new Token(JWT.JsonWebToken.Encode(payload, secretKey, JWT.JwtHashAlgorithm.HS256));
+
+                    //TODO
+                    //returnContent.Content = token;
+
+                    return null;
+                }
+                else
+                {
+                    if (user != null)
+                    {
+                        //TODO
+                        //if (user.IsLockedOut)
+                        //{
+                        //    returnContent.StatusCode = HttpStatusCode.Forbidden;
+                        //    returnContent.Content = "Account locked out. Please contact your administrator";
+                        //}
+                        //if (!user.IsApproved)
+                        //{
+                        //    returnContent.StatusCode = HttpStatusCode.Forbidden;
+                        //    returnContent.Content = "Account access has been denied. Please contact your administrator";
+                        //}
+                    }
+                    returnContent.StatusCode = HttpStatusCode.NotFound;
+                    returnContent.Content = "No user found with the provided credentials";
+                }
+                return returnContent;
+            }
+            catch (Exception ex)
+            {
+                return InternalServerError(ex);
+            }
+        }
+
+
         [Route("userinfo")]
         public UserInfoViewModel GetUserInfo()
         {
@@ -46,7 +103,7 @@ namespace WiseMan.API.Controllers
         {
             return null;
         }
-             
+
 
         // POST api/Account/ChangePassword
         [Route("changepassword")]
@@ -59,7 +116,6 @@ namespace WiseMan.API.Controllers
 
             return Ok();
         }
-        
 
         // POST api/Account/Register
         /// <summary>
@@ -102,10 +158,10 @@ namespace WiseMan.API.Controllers
             }
 
         }
-           
-    
+
+
         #region Helpers
-        
+
         private IHttpActionResult GetErrorResult(IdentityResult result)
         {
             if (result == null)
