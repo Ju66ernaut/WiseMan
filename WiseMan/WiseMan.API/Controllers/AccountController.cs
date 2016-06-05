@@ -19,6 +19,7 @@ namespace WiseMan.API.Controllers
         {
         }
 
+        [AllowAnonymous]
         [Route("login"), HttpPost, ResponseType(typeof(JWT.JsonWebToken))]
         public IHttpActionResult Login(Login model)
         {
@@ -38,7 +39,7 @@ namespace WiseMan.API.Controllers
                 //var testTokenStr = testToken.ToHexString();
 
                 User user = null;
-                var returnContent = new ApiQueryResult<object>(this.Request);
+                var returnContent = new ApiResult<object>(this.Request);
 
                 if (AccountHelper.ValidateUser(model.Username, model.Password, out user))
                 {
@@ -124,14 +125,14 @@ namespace WiseMan.API.Controllers
         /// <param name="model"></param>
         /// <returns></returns>
         [AllowAnonymous]
-        [Route("register"), HttpPost, ResponseType(typeof(ApiQueryResult<string>))]
+        [Route("register"), HttpPost, ResponseType(typeof(ApiResult<string>))]
         public async Task<IHttpActionResult> Register(RegisterBindingModel model)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
-            ApiQueryResult<RegistrationSuccess> result = new ApiQueryResult<RegistrationSuccess>(this.Request);
+            ApiResult<RegistrationSuccess> result = new ApiResult<RegistrationSuccess>(this.Request);
             try
             {
                 AccountHelper.RegisterNewAccount(model.Username, model.Password, model.Email);
@@ -147,7 +148,7 @@ namespace WiseMan.API.Controllers
             }
             catch (Exception ex)
             {
-                ApiQueryResult<ErrorResult> exceptionResult = new ApiQueryResult<ErrorResult>(this.Request);
+                ApiResult<ErrorResult> exceptionResult = new ApiResult<ErrorResult>(this.Request);
                 exceptionResult.Content = new ErrorResult()
                 {
                     ErrorMessage = ex.InnerException.Message,

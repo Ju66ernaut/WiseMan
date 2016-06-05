@@ -52,9 +52,7 @@ namespace WiseMan.API.Filters
 
             //will having the user object in the context make the authorId parameter in endpoints obsolete?
             var user = AccountHelper.GetUserByUsername(username);
-
-
-            //add user object to request -- this may be reduced to just unitId or something
+                        
             //TODO:
             //THIS MAY CHANGE
             actionContext.Request.Properties.Add("user", user);

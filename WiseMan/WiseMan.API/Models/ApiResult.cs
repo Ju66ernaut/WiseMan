@@ -10,9 +10,9 @@ using System.Web.Http;
 
 namespace WiseMan.API.Models
 {
-    public class ApiQueryResult<T>: IHttpActionResult where T : class
+    public class ApiResult<T>: IHttpActionResult where T : class
     {
-        public ApiQueryResult(HttpRequestMessage request)
+        public ApiResult(HttpRequestMessage request)
         {
             this.StatusCode = HttpStatusCode.OK; ;
             this.HeadersToAdd = new List<MyStringPair>();

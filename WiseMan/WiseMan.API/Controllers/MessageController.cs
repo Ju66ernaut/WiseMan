@@ -21,7 +21,7 @@ namespace WiseMan.API.Controllers
         [Route("id/{messageId}"), HttpGet, ResponseType(typeof(Message))]
         public IHttpActionResult GetMessage(Guid messageId)
         {
-            ApiQueryResult<ErrorResult> exResult = new ApiQueryResult<ErrorResult>(this.Request);
+            ApiResult<ErrorResult> exResult = new ApiResult<ErrorResult>(this.Request);
             if (messageId == null)
             {
                 exResult.Content = new ErrorResult()
@@ -35,7 +35,7 @@ namespace WiseMan.API.Controllers
             {
                 Message message = MessageHelper.GetMessageById(messageId);
 
-                return new ApiQueryResult<Message>(this.Request)
+                return new ApiResult<Message>(this.Request)
                 {
                     Content = message,
                     StatusCode = HttpStatusCode.OK
@@ -62,7 +62,7 @@ namespace WiseMan.API.Controllers
         [Route("authorId/{authorId}"), HttpGet, ResponseType(typeof(List<Message>))]
         public IHttpActionResult GetMessagesByAuthor(Guid authorId)
         {
-            ApiQueryResult<ErrorResult> exResult = new ApiQueryResult<ErrorResult>(this.Request);
+            ApiResult<ErrorResult> exResult = new ApiResult<ErrorResult>(this.Request);
             if (authorId == null)
             {
                 exResult.Content = new ErrorResult() { HttpStatusCode = HttpStatusCode.BadRequest, ErrorMessage = "authorId is null" };
@@ -72,7 +72,7 @@ namespace WiseMan.API.Controllers
             try
             {
                 List<Message> messagesByAuthor = MessageHelper.GetMessagesByAuthorId(authorId);
-                ApiQueryResult<List<Message>> messages = new ApiQueryResult<List<Message>>(this.Request)
+                ApiResult<List<Message>> messages = new ApiResult<List<Message>>(this.Request)
                 {
                     Content = messagesByAuthor,
                     StatusCode = HttpStatusCode.OK
@@ -101,7 +101,7 @@ namespace WiseMan.API.Controllers
             //TODO
             //restrict tag length
             //no spaces in tags (tell users to use '-')
-            ApiQueryResult<ErrorResult> exResult = new ApiQueryResult<ErrorResult>(this.Request);
+            ApiResult<ErrorResult> exResult = new ApiResult<ErrorResult>(this.Request);
             if (string.IsNullOrEmpty(newMessage.Body))
             {
                 exResult.Content = new ErrorResult() { HttpStatusCode = HttpStatusCode.BadRequest, ErrorMessage = "message body can not be empty" };
@@ -141,7 +141,7 @@ namespace WiseMan.API.Controllers
                 //return new message data back?
 
                 //what data needs to be returned here? return Message or NewMessage data
-                ApiQueryResult<Message> message = new ApiQueryResult<Message>(this.Request)
+                ApiResult<Message> message = new ApiResult<Message>(this.Request)
                 {
                     StatusCode = HttpStatusCode.Created,
                     Content = new Message()
@@ -173,7 +173,7 @@ namespace WiseMan.API.Controllers
         [Route("delete/{messageId}"), HttpDelete]
         public IHttpActionResult DeleteMessage(Guid messageId)
         {
-            ApiQueryResult<ErrorResult> exResult = new ApiQueryResult<ErrorResult>(this.Request);
+            ApiResult<ErrorResult> exResult = new ApiResult<ErrorResult>(this.Request);
      
             if (messageId == null)
             {
@@ -187,7 +187,7 @@ namespace WiseMan.API.Controllers
                 //get authorId from user object 
                 //MessageHelper.DeleteMessage(user.Id, messageId);
 
-                return new ApiQueryResult<DeleteMessageSuccess>(this.Request)
+                return new ApiResult<DeleteMessageSuccess>(this.Request)
                 {
                     StatusCode = HttpStatusCode.Accepted,
                     Content = new DeleteMessageSuccess()
