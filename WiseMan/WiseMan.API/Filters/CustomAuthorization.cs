@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -7,6 +8,7 @@ using System.Net.Http.Formatting;
 using System.Web;
 using System.Web.Http;
 using System.Web.Http.Controllers;
+using System.Web.Http.Filters;
 using WiseMan.API.Utility;
 
 namespace WiseMan.API.Filters
@@ -15,6 +17,10 @@ namespace WiseMan.API.Filters
     {
         public override void OnAuthorization(HttpActionContext actionContext)
         {
+            if (SkipAuthorization(actionContext))
+            {
+                return;
+            }
             if (AuthorizeRequest(actionContext))
             {
                 return;
@@ -24,7 +30,8 @@ namespace WiseMan.API.Filters
         }
 
         private bool AuthorizeRequest(HttpActionContext actionContext)
-        {
+        {           
+          
             var headers = actionContext.Request.Headers;
 
             if (!headers.Contains("Authorization"))
@@ -72,6 +79,13 @@ namespace WiseMan.API.Filters
                 Content = new ObjectContent<UnauthorizedResponse>(response, new JsonMediaTypeFormatter(), "application/json")
             };
 
+        }
+        private static bool SkipAuthorization(HttpActionContext actionContext)
+        {
+            Contract.Assert(actionContext != null);
+
+            return actionContext.ActionDescriptor.GetCustomAttributes<AllowAnonymousAttribute>().Any()
+                   || actionContext.ControllerContext.ControllerDescriptor.GetCustomAttributes<AllowAnonymousAttribute>().Any();
         }
     }
 }

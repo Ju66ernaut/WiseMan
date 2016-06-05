@@ -82,5 +82,13 @@ namespace WiseMan.API.Utility
                 db.DeleteMessage(messageId, authorId);
             }
         }
+
+        internal static void UpvoteMessage(Guid messageId, Guid userId)
+        {
+            using(Data.WiseManEntities db = new Data.WiseManEntities())
+            {
+                db.UpvoteMessage(messageId, userId);
+            }
+        }
     }
 }

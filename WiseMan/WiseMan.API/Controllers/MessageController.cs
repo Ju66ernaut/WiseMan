@@ -5,11 +5,13 @@ using System.Net;
 using System.Net.Http;
 using System.Web.Http;
 using System.Web.Http.Description;
+using WiseMan.API.Filters;
 using WiseMan.API.Models;
 using WiseMan.API.Utility;
 
 namespace WiseMan.API.Controllers
 {
+    [CustomAuthorization]
     [RoutePrefix("api/v1/messages")]
     public class MessageController : BaseController
     {
@@ -215,23 +217,31 @@ namespace WiseMan.API.Controllers
         /// <param name="userId"></param>
         /// <returns></returns>
         [Route("upvote/{messageId}"), HttpPost]
-        public IHttpActionResult UpvoteMessage(Guid messageId, Guid userId)
+        public IHttpActionResult UpvoteMessage(Guid messageId)
         {
-            //may not need userId if i decide to use JWT
-            if (messageId == null || userId == null)
+            ApiResult<ErrorResult> exResult = new ApiResult<ErrorResult>(this.Request);
+     
+            if (messageId == null)
             {
-                //
+                exResult.Content = new ErrorResult() { HttpStatusCode = HttpStatusCode.BadRequest, ErrorMessage = "messageId cannot be null" };
+                return exResult;
             }
-            //has current user already upvoted?
-            //has current user already downvoted
-            //has the user taken any action on this message
-            //cannot upvote their own message
-
-            //upvoting increments the message's upvotes
-
-            //userUpvote table?
-
-            return null;
+            User user = Request.Properties["user"] as User;
+            try
+            {
+                MessageHelper.UpvoteMessage(messageId, user.Id);
+                return new ApiResult<string>(this.Request) { StatusCode = HttpStatusCode.OK, Content = "Message upovted" };
+            }
+            catch (Exception ex)
+            {
+                exResult.Content = new ErrorResult()
+                {
+                    ErrorMessage = ex.InnerException.Message,
+                    HttpStatusCode = HttpStatusCode.InternalServerError
+                };
+                return exResult;
+            }     
+     
         }
         /// <summary>
         /// Adds 1 to the downvote counter for the given message

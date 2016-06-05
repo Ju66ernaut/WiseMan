@@ -7,18 +7,14 @@ using WiseMan.API.Utility;
 using System.Web.Http.Description;
 using System.Collections.Generic;
 using System.Net;
+using WiseMan.API.Filters;
 
 namespace WiseMan.API.Controllers
 {
-    [Authorize]
+    [CustomAuthorization]
     [RoutePrefix("api/v1/account")]
     public class AccountController : ApiController
     {
-
-        public AccountController()
-        {
-        }
-
         [AllowAnonymous]
         [Route("login"), HttpPost, ResponseType(typeof(JWT.JsonWebToken))]
         public IHttpActionResult Login(Login model)
@@ -34,12 +30,9 @@ namespace WiseMan.API.Controllers
             }
             try
             {
-                ////testing usertoken
-                //UserToken testToken = new UserToken(model.Username, model.Password, DateTime.Now.AddHours(1));
-                //var testTokenStr = testToken.ToHexString();
-
+               
                 User user = null;
-                var returnContent = new ApiResult<object>(this.Request);
+                var returnContent = new ApiResult<Object>(this.Request);
 
                 if (AccountHelper.ValidateUser(model.Username, model.Password, out user))
                 {
@@ -55,14 +48,10 @@ namespace WiseMan.API.Controllers
                         };
 
                     var secretKey = System.Configuration.ConfigurationManager.AppSettings["appKey"];
+                    
+                    returnContent.Content = new Token(JWT.JsonWebToken.Encode(payload, secretKey, JWT.JwtHashAlgorithm.HS256));
 
-                    //TODO
-                    //var token = new Token(JWT.JsonWebToken.Encode(payload, secretKey, JWT.JwtHashAlgorithm.HS256));
-
-                    //TODO
-                    //returnContent.Content = token;
-
-                    return null;
+                    return returnContent;
                 }
                 else
                 {
@@ -91,22 +80,18 @@ namespace WiseMan.API.Controllers
             }
         }
 
-
         [Route("userinfo")]
         public UserInfoViewModel GetUserInfo()
         {
             return null;
         }
-
-        // POST api/Account/Logout
+        
         [Route("logout")]
         public IHttpActionResult Logout()
         {
             return null;
         }
-
-
-        // POST api/Account/ChangePassword
+        
         [Route("changepassword")]
         public async Task<IHttpActionResult> ChangePassword(ChangePasswordBindingModel model)
         {
@@ -117,8 +102,7 @@ namespace WiseMan.API.Controllers
 
             return Ok();
         }
-
-        // POST api/Account/Register
+        
         /// <summary>
         /// Registers a new user
         /// </summary>
@@ -141,7 +125,7 @@ namespace WiseMan.API.Controllers
                     SuccessMessage = "New account successfully registered",
                     Token = "hfihsfihfinsdfjiidf"
                 };
-                result.StatusCode = System.Net.HttpStatusCode.OK;
+                result.StatusCode = HttpStatusCode.OK;
                 return result;
                 //this should also authenticate the user and pass back a JWT
                 //make json object with message and JWT?
@@ -152,46 +136,14 @@ namespace WiseMan.API.Controllers
                 exceptionResult.Content = new ErrorResult()
                 {
                     ErrorMessage = ex.InnerException.Message,
-                    HttpStatusCode = System.Net.HttpStatusCode.BadRequest
+                    HttpStatusCode = HttpStatusCode.BadRequest
                 };
-                exceptionResult.StatusCode = System.Net.HttpStatusCode.BadRequest;
+                exceptionResult.StatusCode = HttpStatusCode.BadRequest;
                 return exceptionResult;
             }
 
         }
 
-
-        #region Helpers
-
-        private IHttpActionResult GetErrorResult(IdentityResult result)
-        {
-            if (result == null)
-            {
-                return InternalServerError();
-            }
-
-            if (!result.Succeeded)
-            {
-                if (result.Errors != null)
-                {
-                    foreach (string error in result.Errors)
-                    {
-                        ModelState.AddModelError("", error);
-                    }
-                }
-
-                if (ModelState.IsValid)
-                {
-                    // No ModelState errors are available to send, so just return an empty BadRequest.
-                    return BadRequest();
-                }
-
-                return BadRequest(ModelState);
-            }
-
-            return null;
-        }
-
-        #endregion
+        
     }
 }
