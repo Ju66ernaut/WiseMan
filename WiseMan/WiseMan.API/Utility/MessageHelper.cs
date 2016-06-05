@@ -90,5 +90,13 @@ namespace WiseMan.API.Utility
                 db.UpvoteMessage(messageId, userId);
             }
         }
+
+        internal static void DownvoteMessage(Guid messageId, Guid userId)
+        {
+            using (Data.WiseManEntities db = new Data.WiseManEntities())
+            {
+                db.DownvoteMessage(messageId, userId);
+            }
+        }
     }
 }

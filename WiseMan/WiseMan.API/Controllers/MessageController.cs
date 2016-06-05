@@ -185,9 +185,9 @@ namespace WiseMan.API.Controllers
 
             try
             {
-                //TODO
-                //get authorId from user object 
-                //MessageHelper.DeleteMessage(user.Id, messageId);
+                User user = Request.Properties["user"] as User;
+  
+                MessageHelper.DeleteMessage(user.Id, messageId);
 
                 return new ApiResult<DeleteMessageSuccess>(this.Request)
                 {
@@ -252,19 +252,28 @@ namespace WiseMan.API.Controllers
         [Route("upvote/{messageId}"), HttpPost]
         public IHttpActionResult DownvoteMessage(Guid messageId, Guid userId)
         {
-            //may not need userId if i decide to use JWT
-            if (messageId == null || userId == null)
+            ApiResult<ErrorResult> exResult = new ApiResult<ErrorResult>(this.Request);
+
+            if (messageId == null)
             {
-
+                exResult.Content = new ErrorResult() { HttpStatusCode = HttpStatusCode.BadRequest, ErrorMessage = "messageId cannot be null" };
+                return exResult;
             }
-            return null;
-
-            //has current user already upvoted?
-            //has current user already downvoted
-            //has the user taken any action on this message
-            //cannot downvote their own message
-
-            //downvoting increases the messages downvotes
+            User user = Request.Properties["user"] as User;
+            try
+            {
+                MessageHelper.DownvoteMessage(messageId, user.Id);
+                return new ApiResult<string>(this.Request) { StatusCode = HttpStatusCode.OK, Content = "Message downvoted" };
+            }
+            catch (Exception ex)
+            {
+                exResult.Content = new ErrorResult()
+                {
+                    ErrorMessage = ex.InnerException.Message,
+                    HttpStatusCode = HttpStatusCode.InternalServerError
+                };
+                return exResult;
+            }
         }
 
         /// <summary>
