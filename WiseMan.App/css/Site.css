@@ -1,0 +1,23 @@
+﻿
+body {
+    background: #1e1e1e;
+}
+.top-bar{
+    background: #373241;
+}
+.panel {
+    border-radius: 5px;
+}
+
+#messageOfTheDay{
+    margin-top: 20px;
+}
+
+.upvote {
+    color: #029417;
+}
+
+.downvote {
+    color: crimson;
+}
+
