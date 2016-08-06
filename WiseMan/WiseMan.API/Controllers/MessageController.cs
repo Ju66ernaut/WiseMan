@@ -20,6 +20,7 @@ namespace WiseMan.API.Controllers
         /// </summary>
         /// <param name="messageId"></param>
         /// <returns></returns>
+        [AllowAnonymous]
         [Route("id/{messageId}"), HttpGet, ResponseType(typeof(Message))]
         public IHttpActionResult GetMessage(Guid messageId)
         {
@@ -61,6 +62,7 @@ namespace WiseMan.API.Controllers
         /// </summary>
         /// <param name="authorId"></param>
         /// <returns></returns>
+        [AllowAnonymous]
         [Route("authorId/{authorId}"), HttpGet, ResponseType(typeof(List<Message>))]
         public IHttpActionResult GetMessagesByAuthor(Guid authorId)
         {
@@ -109,11 +111,11 @@ namespace WiseMan.API.Controllers
                 exResult.Content = new ErrorResult() { HttpStatusCode = HttpStatusCode.BadRequest, ErrorMessage = "message body can not be empty" };
                 return exResult;
             }
-            if (newMessage.AuthorId == null)
-            {
-                exResult.Content = new ErrorResult() { HttpStatusCode = HttpStatusCode.BadRequest, ErrorMessage = "authorId is null" };
-                return exResult;
-            }
+            //if (newMessage.AuthorId == null)
+            //{
+            //    exResult.Content = new ErrorResult() { HttpStatusCode = HttpStatusCode.BadRequest, ErrorMessage = "authorId is null" };
+            //    return exResult;
+            //}
             if (newMessage.Tags.Count == 0 || newMessage.Tags.Count > 3)
             {
                 exResult.Content = new ErrorResult() { HttpStatusCode = HttpStatusCode.BadRequest, ErrorMessage = "messages can only have up to 3 tags" };
@@ -136,9 +138,11 @@ namespace WiseMan.API.Controllers
                 //check DB for last post
                 //if user points amount is under X amount, limit the post intervals
                 ////if last post was within 8 min, reject the current post
+                User user = Request.Properties["user"] as User;
+
                 List<string> tagsLower = newMessage.Tags.Select(t => t.ToLowerInvariant()).ToList();
 
-                MessageHelper.CreateMessage(newMessage.Body, newMessage.AuthorId, tagsLower); //get tagIds out?
+                MessageHelper.CreateMessage(newMessage.Body, user.Id, tagsLower); //get tagIds out?
 
                 //return new message data back?
 
@@ -285,6 +289,7 @@ namespace WiseMan.API.Controllers
         public IHttpActionResult GetFavorites(Guid userId)
         {
             //may not need userId if i decide to use JWT
+            //TODO
             if (userId == null)
             {
                 //
@@ -301,6 +306,7 @@ namespace WiseMan.API.Controllers
         public IHttpActionResult GetMessagesByTags(Guid tagId)
         {
             //take in array of tags?
+            //TODO
             if (tagId == null)
             {
 
@@ -321,6 +327,7 @@ namespace WiseMan.API.Controllers
         {
             //not sure about this implementation
             //top, new
+            //TODO
             if (string.IsNullOrEmpty(methodName) || userId == null)
             {
                 //

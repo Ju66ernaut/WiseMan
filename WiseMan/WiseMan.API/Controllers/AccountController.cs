@@ -36,20 +36,7 @@ namespace WiseMan.API.Controllers
 
                 if (AccountHelper.ValidateUser(model.Username, model.Password, out user))
                 {
-                    var unixEpoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
-                    var weekFromNow = Math.Round((DateTime.UtcNow.AddDays(7) - unixEpoch).TotalSeconds);
-
-                    var payload = new Dictionary<string, object>()
-                        {
-                            { "iss", "wiseman" },
-                            { "exp", weekFromNow },
-                            { "sub", model.Username }
-                            //"scopes", roles ?                                                                     
-                        };
-
-                    var secretKey = System.Configuration.ConfigurationManager.AppSettings["appKey"];
-                    
-                    returnContent.Content = new Token(JWT.JsonWebToken.Encode(payload, secretKey, JWT.JwtHashAlgorithm.HS256));
+                    returnContent.Content = GenerateToken(model.Username);
 
                     return returnContent;
                 }
@@ -79,30 +66,6 @@ namespace WiseMan.API.Controllers
                 return InternalServerError(ex);
             }
         }
-
-        [Route("userinfo")]
-        public UserInfoViewModel GetUserInfo()
-        {
-            return null;
-        }
-        
-        [Route("logout")]
-        public IHttpActionResult Logout()
-        {
-            return null;
-        }
-        
-        [Route("changepassword")]
-        public async Task<IHttpActionResult> ChangePassword(ChangePasswordBindingModel model)
-        {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-
-            return Ok();
-        }
-        
         /// <summary>
         /// Registers a new user
         /// </summary>
@@ -120,15 +83,14 @@ namespace WiseMan.API.Controllers
             try
             {
                 AccountHelper.RegisterNewAccount(model.Username, model.Password, model.Email);
+
                 result.Content = new RegistrationSuccess()
                 {
                     SuccessMessage = "New account successfully registered",
-                    Token = "hfihsfihfinsdfjiidf"
+                    Token = GenerateToken(model.Username)
                 };
                 result.StatusCode = HttpStatusCode.OK;
                 return result;
-                //this should also authenticate the user and pass back a JWT
-                //make json object with message and JWT?
             }
             catch (Exception ex)
             {
@@ -144,6 +106,50 @@ namespace WiseMan.API.Controllers
 
         }
 
-        
+        [Route("userinfo")]
+        public UserInfoViewModel GetUserInfo()
+        {
+            return null;
+        }
+
+        [Route("logout")]
+        public IHttpActionResult Logout()
+        {
+            return null;
+        }
+
+        [Route("changepassword")]
+        public async Task<IHttpActionResult> ChangePassword(ChangePasswordBindingModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            return Ok();
+        }
+
+
+        #region Private Methods
+
+        private static Token GenerateToken(string username)
+        {
+            var unixEpoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+            var weekFromNow = Math.Round((DateTime.UtcNow.AddDays(7) - unixEpoch).TotalSeconds);
+
+            var payload = new Dictionary<string, object>()
+                        {
+                            { "iss", "wiseman" },
+                            { "exp", weekFromNow },
+                            { "sub", username }
+                            //"scopes", roles ?                                                                     
+                        };
+
+            var secretKey = System.Configuration.ConfigurationManager.AppSettings["appKey"];
+            
+            return new Token(JWT.JsonWebToken.Encode(payload, secretKey, JWT.JwtHashAlgorithm.HS256));
+        }
+
+        #endregion             
     }
 }

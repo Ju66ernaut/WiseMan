@@ -9,6 +9,6 @@ namespace WiseMan.API.Models
     {
         public string SuccessMessage { get; set; }
 
-        public string Token { get; set; }
+        public Token Token { get; set; }
     }
 }
