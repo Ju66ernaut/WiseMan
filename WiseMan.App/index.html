@@ -1,4 +1,4 @@
-
+﻿
 <!DOCTYPE html>
 <!--[if IE 9]><html class="lt-ie10" lang="en" > <![endif]-->
 <html class="no-js" lang="en">
@@ -16,7 +16,7 @@
     <link href="css/Site.css" rel="stylesheet" />
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/modernizr/2.8.3/modernizr.min.js"></script>
-  
+
 </head>
 <body>
     <nav class="top-bar" data-topbar>
@@ -30,7 +30,7 @@
 
             <ul class="right">
 
-                <li><input type="text" placeholder="Search (icon)" /></li> 
+                <li><input type="text" placeholder="Search (icon)" /></li>
                 <li><a href="#">Post Message</a></li>
                 <li class="divider"></li>
                 <li class="has-dropdown">
@@ -42,7 +42,7 @@
                             <ul class="dropdown">
                                 <li><a href="#">Today</a></li>
                                 <li><a href="#">This Month</a></li>
-                                <li><a href="#">All Time</a></li>                         
+                                <li><a href="#">All Time</a></li>
                             </ul>
                         </li>
                         <li><a href="#">Newest</a></li>
@@ -51,20 +51,20 @@
                             <ul class="dropdown">
                                 <li><a href="#">Work</a></li>
                                 <li><a href="#">Money</a></li>
-                                <li><a href="#">Women</a></li>                      
-                                <li><a href="#">Funny</a></li>   
+                                <li><a href="#">Women</a></li>
+                                <li><a href="#">Funny</a></li>
                             </ul>
                         </li>
                     </ul>
-                </li>              
+                </li>
                 <li class="divider"></li>
                 <li class="has-dropdown">
                     <a href="#">Username</a>
                     <ul class="dropdown">
                         <li><a href="#"><i class="fi-mail"></i> My Messages</a></li>
-                        <li><a href="#"><i class="fi-star"></i> Favorites</a></li>                      
-                        <li><a href="#"><i class="fi-torso"></i> Profile</a></li>  
-                        <li><a href="#"><i class="fi-power"></i> Log out</a></li>  
+                        <li><a href="#"><i class="fi-star"></i> Favorites</a></li>
+                        <li><a href="#"><i class="fi-torso"></i> Profile</a></li>
+                        <li><a href="#"><i class="fi-power"></i> Log out</a></li>
                     </ul>
                 </li>
             </ul>
@@ -78,16 +78,18 @@
                 <h2>blah blah blah blah blah</h2>
                 <h6 class="right">1023 <i class="fi-arrow-up"></i> 230 <i class="fi-arrow-down"></i></h6>
             </div>
-        </div>        
-    </div>    
-   
+        </div>
+    </div>
+
     <div class="row">
         <div class="large-3 columns">
-            <div class="panel">           
+            <div class="panel">
                 <p>This is a three columns grid panel with an arbitrary height.</p>
                 <h5>Author</h5>
                 <!--TODO:
                 need to figure out where to put tags-->
+                <!--https://icons8.com/web-app/for/all/marriage-->
+                <!--http://fontawesome.io/icons/-->
                 <h6 class="right">1023 <i class="fi-arrow-up"></i> 230 <i class="fi-arrow-down"></i></h6>
             </div>
         </div>
@@ -96,6 +98,7 @@
                 <p>This is a six columns grid panel with an arbitrary height. Bacon ipsum dolor sit amet salami ham hock biltong ball tip drumstick sirloin pancetta meatball short loin.</p>
                 <h5>Author</h5>
                 <h6 class="right"><span class="upvote">866 </span><i class="fi-arrow-up"></i><span class="downvote"> 410 </span><i class="fi-arrow-down"></i></h6>
+                <h5 class="left"><i class="fi-money"></i></h5>
             </div>
         </div>
         <div class="large-3  columns">
@@ -159,8 +162,28 @@
     <script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/foundation/5.5.3/js/foundation.min.js"></script>
     <script>
-      $(document).foundation();
+        $(document).foundation();
     </script>
 
 </body>
 </html>
+
+<script>
+    $(document).ready(function () {
+        $("#productos").submit(function (e) {
+            var form = this; e.preventDefault();
+            var fileInput = $(this).find("#file")
+            [0], file = fileInput.files && fileInput.files[0]; console.log(file)
+            if (file) {
+                var img = new Image();
+                img.src = window.URL.createObjectURL(file);
+                img.onload = function () {
+                    var width = img.naturalWidth, height = img.naturalHeight;
+                    window.URL.revokeObjectURL(img.src);
+                    if (width <= 200 && height <= 200) { form.submit(); } else
+                    { alert('THIS IS AN UGGLY ALERT WE WANT TO CHANGE'); }
+                };
+            } else { form.submit(); }
+        });
+    });
+</script>

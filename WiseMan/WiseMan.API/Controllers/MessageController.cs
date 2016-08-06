@@ -249,7 +249,7 @@ namespace WiseMan.API.Controllers
         /// <param name="messageId"></param>
         /// <param name="userId"></param>
         /// <returns></returns>
-        [Route("upvote/{messageId}"), HttpPost]
+        [Route("downvote/{messageId}"), HttpPost]
         public IHttpActionResult DownvoteMessage(Guid messageId, Guid userId)
         {
             ApiResult<ErrorResult> exResult = new ApiResult<ErrorResult>(this.Request);
