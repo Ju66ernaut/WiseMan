@@ -1,4 +1,4 @@
-# Repo_WiseMan
+# WiseMan
 
 Wise Man is a way to share and view life lessons from others
 
