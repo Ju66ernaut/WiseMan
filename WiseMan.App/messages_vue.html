@@ -1,0 +1,140 @@
+﻿<html>
+
+<head>
+    <script src="https://code.jquery.com/jquery.min.js"></script>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+    <!--<script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.0.3/vue.js"></script>-->
+    <script src="https://unpkg.com/vue/dist/vue.js"></script>
+    <style>
+        .header3 {
+            background-color: rgba(163, 210, 249, 0.71);
+        }
+
+        .msgBox {
+            border-radius: 10px;
+            border: solid 0.5px;
+            margin: 10px;
+        }
+
+        a {
+            padding-left: 5px;
+        }
+
+        .glyphicon {
+            opacity: 1;
+            transition: opacity .25s ease-in-out;
+            -moz-transition: opacity .25s ease-in-out;
+            -webkit-transition: opacity .25s ease-in-out;
+        }
+
+            .glyphicon:hover {
+                opacity: 0.75;
+                cursor: pointer;
+            }
+
+        .disabled {
+            color: orange;
+        }
+    </style>
+
+</head>
+<body>
+
+    <template id="msgTemplate">
+        <div class="msgBox">
+            <h3 class="header3">{{msg.body}}</h3>
+            <p>-{{msg.author}}</p>
+            <li class="list-group-item">
+                <i class="glyphicon glyphicon-chevron-up" @click="upvote" :class="{disabled: upvoted}"></i>
+                <span class="label label-primary">{{ votes }}</span>
+                <i class="glyphicon glyphicon-chevron-down" @click="downvote" :class="{disabled: downvoted}"></i>
+            </li>
+            <ul>
+                <li v-for="tag in msg.tags">{{tag}}</li>
+            </ul>
+        </div>
+    </template>
+    <div class="content-inner">
+        <div class="container">
+            <div class="row">
+                <div id="messageContainer">
+                    <msg-component v-for="msg in messages" :msg="msg">                        
+                    </msg-component>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+</body>
+
+</html>
+
+
+<script>
+    var messages = [
+    {
+        body: "Eat your vegetables",
+        author: "Goodie",
+        votes: 150,
+        id: 1,
+        tags: ['food', 'phrases']
+    },
+    {
+        body: "Dont stay up late",
+        author: "Goodie",
+        votes: 29,
+        id: 2,
+        tags: ['sleep', 'life-lessons']
+    }
+    ];
+
+    Vue.component('msgComponent', {
+        props: ['msg'],
+        template: '#msgTemplate',
+        data: function () {
+            return {
+                upvoted: false,
+                downvoted: false
+            }
+        },
+        methods: {
+            upvote: function () {
+                this.upvoted = !this.upvoted;
+                this.downvoted = false;
+                //need to decide if I send a req each upvote/downvote/UNvote, etc
+            },
+            downvote: function () {
+                this.downvoted = !this.downvoted;
+                this.upvoted = false;
+            }
+        },
+        watch: {
+            votes: function () {
+                console.log(this.msg.votes);
+            }
+        },
+        computed: {
+            votes: function () {
+                if (this.upvoted) {
+                    return this.msg.votes + 1;
+                }
+                else if (this.downvoted) {
+                    return this.msg.votes - 1;
+                }
+                else {
+                    return this.msg.votes;
+                }
+            }
+        }
+    });
+
+
+    new Vue({
+        el: "#messageContainer",
+        data: {
+            messages: messages
+        }
+    });
+</script>
