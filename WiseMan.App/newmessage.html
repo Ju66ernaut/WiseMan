@@ -1,0 +1,53 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.2.3/css/bulma.css">
+    <link rel="stylesheet" type="text/css" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1/themes/flick/jquery-ui.css">
+    <link href="css/jquery.tagit.css" rel="stylesheet" />
+
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.5.2/jquery.min.js" type="text/javascript" charset="utf-8"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.12/jquery-ui.min.js" type="text/javascript" charset="utf-8"></script>
+    <script src="js/tag-it.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+</head>
+<body>
+    <section class="section">
+        <div class="container" id="newMessageContainer">
+            <label class="label">Create a new lesson {{remaining}}/{{maxlength}}</label>
+            <p class="control">
+                <textarea class="textarea" v-model="body" maxlength="maxlength" placeholder="Write something really insightful... or don't. I don't care."></textarea>
+            </p>
+            <label class="label">Include at least one tag (max 3 tags)</label>
+            <p class="control">
+                <ul id="tagsUL"></ul>
+            </p>
+            <br />
+            <p class="control">
+                <button class="button is-primary" @click="SubmitNewMessage">Submit</button>
+                <button class="button is-danger">Cancel</button>
+            </p>
+        </div>
+    </section>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/1.0.16/vue.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            $("#tagsUL").tagit({
+                afterTagAdded: function (event, ui) {
+                    messageForm.tags.push(ui.tagLabel);
+                },
+                afterTagRemoved: function (event, ui) {
+                    var index = messageForm.tags.indexOf(ui.tagLabel);
+                    if (index > -1) {
+                        messageForm.tags.splice(index, 1);
+                    }
+                },
+                tagLimit: 3
+            });
+       });
+
+    </script>
+    <script src="js/newmessage.js"></script>
+</body>
+</html>
